@@ -5,6 +5,11 @@ YamoDB
 
 ---
 
+## 🛠️ How to install?
+```
+pip install yamodb
+```
+
 🚀 Key Features
 ---------------
 
