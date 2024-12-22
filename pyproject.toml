@@ -1,0 +1,12 @@
+[tool.poetry]
+name = "yamodb"
+version = "0.0.1"
+description = "powerful and lightweight library designed for data and database."
+authors = ["svidaniya"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+cryptography = "3.4"
+python-dateutil = "2.9.0.post0"
+six = "1.17.0"
+PyYAML = "6.0.2"
