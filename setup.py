@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="yamodb",  # Nome da biblioteca
-    version="0.0.1",     # Versão inicial
+    version="0.0.3",     # Versão inicial
     description="powerful and lightweight library designed for data and database.",
     long_description=open("README.md", "r", encoding="utf-8").read(),
     long_description_content_type="text/markdown",

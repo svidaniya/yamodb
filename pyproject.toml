@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "yamodb"
-version = "0.0.1"
+version = "0.0.3"
 description = "powerful and lightweight library designed for data and database."
 authors = ["svidaniya"]
 

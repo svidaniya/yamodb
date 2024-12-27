@@ -5,11 +5,6 @@ YamoDB
 
 ---
 
-## 🛠️ How to install?
-```
-pip install yamodb
-```
-
 🚀 Key Features
 ---------------
 
@@ -40,61 +35,61 @@ pip install yamodb
 ----------------
 
 ```python
-from yamodb import YamoDB, YamTimes
-
-# Setting up YamoDB
-YamoDB.secret = "mysecretkey"
-YamoDB.delete_old_db = True
-YamoDB.connect()
-
-# YAML schema definition
-yaml_db = """
-user:
-    name:
+    from yamodb import YamoDB, YamTimes
+  
+    # Setting up YamoDB
+    YamoDB.secret = "mysecretkey"
+    YamoDB.delete_old_db = True
+    YamoDB.connect()
+  
+    # YAML schema definition
+    yaml_db = """
+    user:
+      name:
         type: string
         primary_key: true
         not_null : true
-    password:
+      password:
         type: encrypted
         not_null: true
-    money:
+      money:
         type: float
-    birthdate:
+      birthdate:
         type: date
-
-book:
-    title:
+  
+    book:
+      title:
         type: string
         primary_key: true
-    owner:
+      owner:
         reference: user.name
         on_delete: cascade
-"""
-
-# Generate schema and insert data
-YamoDB.generate_from(yaml_db)
-YamoDB.insert("user", {
-    'name': 'John Doe',
-    'password': YamoDB.encrypt('password123'),
-    'money': YamoDB.number_placeholder(),
-    'birthdate': YamTimes.today().string()
-})
-
-# Select and decrypt user data
-YamoDB.select("user").where({'name': 'John Doe'}).decrypt('password').first().print()
-
-# Insert a book associated with the user
-YamoDB.insert("book", {'title': 'The Great Gatsby', 'owner': 'John Doe'})
-
-# Retrieve books owned by the user
-YamoDB.select("book").where({'owner': 'John Doe'}).print()
-
-# Delete the user and check cascading deletion on books
-YamoDB.select("user").where({'name': 'John Doe'}).delete()
-YamoDB.select("book").where({'owner': 'John Doe'}).print()
-
-# Close the connection
-YamoDB.close()
+    """
+  
+    # Generate schema and insert data
+    YamoDB.generate_from(yaml_db)
+    YamoDB.insert("user", {
+        'name': 'John Doe',
+        'password': YamoDB.encrypt('password123'),
+        'money': YamoDB.number_placeholder(),
+        'birthdate': YamTimes.today().string()
+    })
+  
+    # Select and decrypt user data
+    YamoDB.select("user").where({'name': 'John Doe'}).decrypt('password').first().print()
+  
+    # Insert a book associated with the user
+    YamoDB.insert("book", {'title': 'The Great Gatsby', 'owner': 'John Doe'})
+  
+    # Retrieve books owned by the user
+    YamoDB.select("book").where({'owner': 'John Doe'}).print()
+  
+    # Delete the user and check cascading deletion on books
+    YamoDB.select("user").where({'name': 'John Doe'}).delete()
+    YamoDB.select("book").where({'owner': 'John Doe'}).print()
+  
+    # Close the connection
+    YamoDB.close()
 ```
 
 ### How This Example Works
