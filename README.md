@@ -35,61 +35,125 @@ YamoDB
 ----------------
 
 ```python
-    from yamodb import YamoDB, YamTimes
-  
-    # Setting up YamoDB
-    YamoDB.secret = "mysecretkey"
-    YamoDB.delete_old_db = True
-    YamoDB.connect()
-  
-    # YAML schema definition
-    yaml_db = """
+from yamodb import YamoDB
+
+
+# --------------------------
+# YamoDB Setup
+# --------------------------
+YamoDB.secret = "mysecretkey"           # Set the secret key for encryption
+YamoDB.delete_old_db = True             # Enable deletion of old databases on startup
+YamoDB.connect()                        # Connect to the YamoDB instance
+
+# --------------------------
+# YAML Schema Definition
+# --------------------------
+yaml_db = """
     user:
       name:
-        type: string
-        primary_key: true
-        not_null : true
+        type: string         # Define 'name' as a string
+        primary_key: true    # 'name' is the primary key for the user table
+        not_null: true       # 'name' cannot be null
       password:
-        type: encrypted
-        not_null: true
+        type: encrypted      # 'password' will be encrypted
+        not_null: true       # 'password' cannot be null
       money:
-        type: float
+        type: float          # 'money' is a floating point number
       birthdate:
-        type: date
-  
+        type: date           # 'birthdate' is a date field
+
     book:
       title:
-        type: string
-        primary_key: true
+        type: string 
+        primary_key: true    # 'title' is the primary key for the book table
       owner:
-        reference: user.name
-        on_delete: cascade
-    """
-  
-    # Generate schema and insert data
-    YamoDB.generate_from(yaml_db)
-    YamoDB.insert("user", {
-        'name': 'John Doe',
-        'password': YamoDB.encrypt('password123'),
-        'money': YamoDB.number_placeholder(),
-        'birthdate': YamTimes.today().string()
-    })
-  
-    # Select and decrypt user data
-    YamoDB.select("user").where({'name': 'John Doe'}).decrypt('password').first().print()
-  
-    # Insert a book associated with the user
-    YamoDB.insert("book", {'title': 'The Great Gatsby', 'owner': 'John Doe'})
-  
-    # Retrieve books owned by the user
-    YamoDB.select("book").where({'owner': 'John Doe'}).print()
-  
-    # Delete the user and check cascading deletion on books
-    YamoDB.select("user").where({'name': 'John Doe'}).delete()
-    YamoDB.select("book").where({'owner': 'John Doe'}).print()
-  
-    # Close the connection
-    YamoDB.close()
+        reference: user.name  # 'owner' references the 'name' field in the 'user' table
+        on_delete: cascade    # Options: cascade, set_null, restrict, no_action
+"""
+
+# --------------------------
+# Generate Schema and Insert Data
+# --------------------------
+YamoDB.generate_from(yaml_db)  # Generate the database schema from the YAML definition
+
+# Insert a new user into the 'user' table
+YamoDB.insert("user", {
+    'name': 'John Doe',
+    'password': YamoDB.encrypt('password123'),  # Encrypt the user's password
+    'money': YamoDB.number_placeholder(),         # Placeholder for 'money' (will be updated later)
+    'birthdate': YamoDB.time().today().string()     # Use today's date for birthdate
+})
+
+# --------------------------
+# Select and Decrypt User Data
+# --------------------------
+result_user = YamoDB.select("user").where({'name': 'John Doe'}).decrypt('password')
+result_user.first().print()  # Print the first user result (shows 'John Doe' with decrypted password)
+
+# --------------------------
+# Insert Books Associated with the User
+# --------------------------
+YamoDB.insert("book", {'title': 'The Great Gatsby', 'owner': 'John Doe'})
+YamoDB.insert("book", {'title': 'To Kill a Mockingbird', 'owner': 'John Doe'})
+
+# --------------------------
+# Query Books Owned by 'John Doe'
+# --------------------------
+result_books = YamoDB.select("book").where({'owner': 'John Doe'})
+result_books.print()  # Print the list of books for 'John Doe'
+
+# --------------------------
+# Update the User's 'money' Field
+# --------------------------
+result_user.update({'money': 100.0}).print()  # Update 'money' for 'John Doe' to 100.0 and print the updated user
+
+# --------------------------
+# Count the Number of Books Owned by 'John Doe'
+# --------------------------
+book_count = result_books.count()
+book_count.print()  # Print the count of books
+
+# --------------------------
+# Sort Books by Title in Descending Order
+# --------------------------
+sorted_books = result_books.order_by('title', desc=True)
+sorted_books.print()  # Print books sorted by title in descending order
+
+# --------------------------
+# Show the First Book in the Result
+# --------------------------
+first_book = result_books.first()
+first_book.print()  # Print the first book in the result set
+
+# --------------------------
+# Group Books by Owner
+# --------------------------
+grouped_books = result_books.group_by('owner')
+grouped_books.print()  # Print the books grouped by owner
+
+# --------------------------
+# Limit the Results to Just 1 Book
+# --------------------------
+limited_books = result_books.limit(1)
+limited_books.print()  # Print only the first book from the result set
+
+# --------------------------
+# Demonstrate a Simulated Update (Without Committing)
+# --------------------------
+# This update simulates the change in memory only (commit=False)
+result_user.update({'money': 200.0}, commit=False).print()
+
+# --------------------------
+# Delete the User and Verify Cascading Deletion on Books
+# --------------------------
+YamoDB.select("user").where({'name': 'John Doe'}).delete()  # Delete 'John Doe' from the user table
+YamoDB.select("book").where({'owner': 'John Doe'}).print()    # Should print an empty list due to cascading delete
+
+# --------------------------
+# Close the Database Connection
+# --------------------------
+YamoDB.close()  # Close the connection to YamoDB
+
 ```
 
 ### How This Example Works
